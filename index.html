@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+
+<meta charset="UTF-8">
+<title>GhostMessage</title>
+
+<style>
+body {
+    font-family: 'Roboto Mono', monospace;
+    margin: 0;
+    background: #1E1E1E;
+    color: #00FF41;
+}
+
+.container {
+    width: 90%;
+    margin: auto;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 20px;
+}
+
+.subtitle {
+    color: #00FF41;
+    margin-bottom: 40px;
+}
+
+.grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.block {
+    width: 25%;  /* ваша ширина */
+}
+
+textarea, input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+    padding: 10px;
+    margin-top: 10px;
+    resize: none;
+}
+
+textarea {
+    height: 140px;
+}
+
+textarea:focus {
+  outline: 2px solid #00FF41;
+}
+input:focus{
+    outline: 2px solid #00FF41;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border: 2px solid transparent;  
+  border-radius: 10px;
+  background: 
+    linear-gradient(#1E1E1E, #1E1E1E) padding-box, 
+    linear-gradient(to right, #00FF41, #009927) border-box;
+  color: #00FF41;
+  cursor: pointer;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+button:hover {
+  background: 
+    linear-gradient(#00FF41, #00FF41) padding-box,
+    linear-gradient(to right, #00FF41, #009927) border-box;
+  color: #000;
+}
+
+.footer {
+    margin-top: 60px;
+    color: #00FF41;
+}
+
+.small {
+    color: #00FF41;
+    font-size: 14px;
+
+}
+.layer2{
+    margin-top: 30px;
+}
+
+/* статус расшифровки */
+#decryptStatus {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 16px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+    <h1>GhostMessage</h1>
+    <div class="subtitle">Hide your message.</div>
+
+    <div class="grid">
+        <div class="block">
+            <div>input</div>
+            <textarea id="message" placeholder="Write your message"></textarea>
+            <div class="layer2">password</div>
+            <input id="key" placeholder="Write password">
+            <button onclick="doEncrypt()">Encrypt</button>
+        </div>
+
+        <div class="block">
+            <div>output</div>
+            <textarea id="output"></textarea>
+        </div>
+
+        <div class="block">
+            <div>encrypted text</div>
+            <textarea id="message1" placeholder="Write encrypted text"></textarea>
+            <div class="layer2">password</div>
+            <input id="key1" placeholder="Write password">
+            <button onclick="doDEcrypt()">Decode</button>
+            <div id="decryptStatus"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div>Contact</div>
+        <div class="small">Telegram - @GhostMessage</div>
+        <div class="small">Mail - ghostmessage@gmail.com</div>
+        <div class=""></div>
+    </div>
+</div>
+
+<script>
+async function doEncrypt() {
+  const msg = document.getElementById('message').value;
+  const key = document.getElementById('key').value;
+  const enc = await encryptMessage(msg, key);
+  document.getElementById('output').value = enc;
+}
+
+async function doDEcrypt() {
+  const msg1 = document.getElementById('message1').value;
+  const key1 = document.getElementById('key1').value;
+  const statusEl = document.getElementById('decryptStatus');
+  const output = document.getElementById('output');   // единое поле вывода
+
+  try {
+    const decrypted = await decryptMessage(msg1, key1);
+    output.value = decrypted;          // результат в output
+    statusEl.textContent = 'Successful';
+    statusEl.style.color = '#00FF41';   // зелёный
+  } catch (e) {
+    output.value = '';                  // очищаем поле при ошибке
+    statusEl.textContent = 'Denied';
+    statusEl.style.color = '#FF4141';   // красный
+  }
+}
+
+async function deriveKey(password, salt) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(password),
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256'
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function encryptMessage(plainText, password) {
+  const enc = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(password, salt);
+
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    enc.encode(plainText)
+  );
+
+  const cipherBuffer = new Uint8Array(ciphertext);
+  const result = new Uint8Array(salt.length + iv.length + cipherBuffer.length);
+  result.set(salt, 0);
+  result.set(iv, salt.length);
+  result.set(cipherBuffer, salt.length + iv.length);
+
+  return btoa(String.fromCharCode(...result));
+}
+
+async function decryptMessage(encryptedBase64, password) {
+  const encryptedData = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+  
+  const salt = encryptedData.slice(0, 16);
+  const iv = encryptedData.slice(16, 28);
+  const ciphertext = encryptedData.slice(28);
+
+  const key = await deriveKey(password, salt);
+  const decrypted = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    ciphertext
+  );
+
+  return new TextDecoder().decode(decrypted);
+}
+</script>
+
+</body>
+</html>

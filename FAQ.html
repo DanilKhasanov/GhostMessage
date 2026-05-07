@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>GhostMessage — FAQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background: #1E1E1E;
+            color: #00FF41;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem 1rem;
+        }
+
+        .faq-container {
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        /* Контейнер для стрелки "Back" и заголовка */
+        .flex {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+            margin-bottom: 0.8rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.8rem;
+            letter-spacing: 2px;
+            color: #00FF41;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #00FF41;
+            margin-bottom: 3rem;
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        /* Блок со стрелкой "Back" */
+        .back-link {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            text-decoration: none;
+            color: #00FF41;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .back-link:hover {
+            opacity: 0.7;
+        }
+
+        .back-link .arrow {
+            font-size: 3.9rem;
+            line-height: 1;
+        }
+
+        .back-link .back-text {
+            font-size: 2.2rem;
+            margin-top: 0.2rem;
+        }
+
+        /* Аккордеон */
+        .accordion-item {
+            margin-bottom: 0.8rem;
+            border: 1px solid #00FF41;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(0, 255, 65, 0.02);
+            transition: all 0.2s ease;
+        }
+
+        .accordion-item:hover {
+            background: rgba(0, 255, 65, 0.06);
+        }
+
+        .accordion-header {
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-bottom: 1px solid transparent;
+            transition: background 0.15s;
+        }
+
+        .accordion-header:hover {
+            background: rgba(0, 255, 65, 0.08);
+        }
+
+        .accordion-item.active .accordion-header {
+            border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+        }
+
+        .arrow-icon {
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.2rem;
+        }
+
+        .accordion-item.active .arrow-icon {
+            transform: rotate(90deg);
+        }
+
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .accordion-body-inner {
+            padding: 0 1.5rem 1.5rem;
+            line-height: 1.7;
+            white-space: pre-line;
+            font-size: 0.95rem;
+            color: #d0ffd0;
+        }
+
+        /* Нижний блок контактов */
+        .faq-footer {
+            margin-top: 4rem;
+            text-align: center;
+            border-top: 1px solid rgba(0, 255, 65, 0.3);
+            padding-top: 2rem;
+        }
+
+        .faq-footer .contact-title {
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .faq-footer .small {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .accordion-header {
+                font-size: 1rem;
+                padding: 1rem;
+            }
+            .back-link .arrow {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="faq-container">
+        <div class="flex">
+            <!-- Кликабельная стрелка «Back» на другую страницу (например, главную) -->
+            <a href="дизайн_тест.html" class="back-link">
+                <div class="arrow">←</div>
+                <div class="back-text">Back</div>
+            </a>
+            <h1>GhostMessage</h1>
+        </div>
+        <div class="subtitle">FAQ – Message Encryption</div>
+
+        <!-- Вопросы/ответы генерируются JS -->
+        <div id="accordion"></div>
+
+        <div class="faq-footer">
+            <div class="contact-title">Contact</div>
+            <div class="small">Telegram - @GhostMessage</div>
+            <div class="small">Mail - ghostmessage@gmail.com</div>
+        </div>
+    </div>
+
+    <script>
+        const faqData = [
+            {
+                question: "How do I use this site?",
+                answer: "1. Enter your text in the \"Message\" field\n2. Enter a password in the \"Key\" field\n3. Click \"Encrypt\"\nYou'll get an encrypted Base64 string – you can send it to anyone\n\nTo decrypt:\n1. Paste the encrypted text into the second field\n2. Enter the same key\n3. Click \"Decrypt\""
+            },
+            {
+                question: "What is the \"key\"?",
+                answer: "The key is a password used for both encryption and decryption.\n- If the key is incorrect – decryption will fail\n- The key is not stored anywhere"
+            },
+            {
+                question: "How does the encryption work?",
+                answer: "The site uses modern browser cryptography:\n- Algorithm: AES-256 (256-bit)\n- Key derivation: PBKDF2 + SHA-256\n- Random values:\n  • salt = 16 bytes\n  • IV (initialization vector) = 12 bytes\n\nDuring encryption:\n1. A cryptographic key is derived from your password\n2. Random salt and IV are generated\n3. The message is encrypted\n4. Everything is combined and encoded in Base64"
+            },
+            {
+                question: "What are salt and IV?",
+                answer: "Salt – random data to protect against password attacks (rainbow tables).\nIV – ensures that even identical messages produce different encrypted outputs.\n\nThis means:\n- Same messages ≠ same ciphertext\n- Harder to crack"
+            },
+            {
+                question: "How secure is it?",
+                answer: "Overall – fairly secure, because:\n- Uses AES-256 (modern standard)\n- Uses PBKDF2 with 100,000 iterations\n- Everything runs locally in your browser\n- No data is sent to a server\n\nBut keep in mind:\n- Security depends on your password\n- Weak passwords can be guessed\n- No protection against:\n  • password interception\n  • phishing\n  • malware on your device"
+            },
+            {
+                question: "Can it be hacked?",
+                answer: "In theory – yes, if:\n- The password is weak (e.g., 123456)\n- Someone gains access to your device\n- Brute-force attacks are used\n\nA strong password makes this extremely difficult."
+            },
+            {
+                question: "How can I make it safer?",
+                answer: "Recommendations:\n- Use a long password (12+ characters)\n- Combine:\n  • letters\n  • numbers\n  • symbols\n- Don't send the key through the same channel as the message"
+            },
+            {
+                question: "Is any data sent to a server?",
+                answer: "No.\n\nEverything happens locally in your browser (Web Crypto API)."
+            },
+            {
+                question: "What is the encrypted output?",
+                answer: "It is:\n- binary data (salt + IV + ciphertext)\n- encoded in Base64\n\nThis makes it:\n- easy to copy\n- easy to send via chat or email"
+            },
+            {
+                question: "Why does the same message produce different results?",
+                answer: "Because each encryption generates:\n- a new salt\n- a new IV\n\nThis is expected and improves security."
+            },
+            {
+                question: "Can I decrypt without the key?",
+                answer: "No.\n\nWithout the correct key:\n- decryption is impossible\n- the data looks like random characters"
+            },
+            {
+                question: "Does it work on mobile?",
+                answer: "Yes, as long as the browser supports the Web Crypto API (Chrome, Safari, Edge – supported)."
+            }
+        ];
+
+        const accordion = document.getElementById('accordion');
+
+        faqData.forEach((item) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'accordion-item';
+
+            const header = document.createElement('div');
+            header.className = 'accordion-header';
+            header.innerHTML = `
+                <span>${item.question}</span>
+                <span class="arrow-icon">▶</span>
+            `;
+
+            const body = document.createElement('div');
+            body.className = 'accordion-body';
+            body.innerHTML = `<div class="accordion-body-inner">${item.answer}</div>`;
+
+            itemDiv.appendChild(header);
+            itemDiv.appendChild(body);
+            accordion.appendChild(itemDiv);
+
+            header.addEventListener('click', () => {
+                const active = itemDiv.classList.contains('active');
+
+                document.querySelectorAll('.accordion-item').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.accordion-body').forEach(el => el.style.maxHeight = null);
+
+                if (!active) {
+                    itemDiv.classList.add('active');
+                    body.style.maxHeight = body.scrollHeight + 'px';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

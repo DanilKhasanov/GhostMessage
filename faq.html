@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>GhostMessage — FAQ</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
@@ -163,25 +164,101 @@
         }
 
         /* Адаптивность */
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2rem;
-            }
-            .accordion-header {
-                font-size: 1rem;
-                padding: 1rem;
-            }
-            .back-link .arrow {
-                font-size: 1.5rem;
-            }
-        }
+        @media (max-width: 768px) {
+
+    body {
+        padding: 1rem 0.7rem;
+    }
+
+    .faq-container {
+        width: 100%;
+    }
+
+    .flex {
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+        line-height: 1.1;
+        word-break: break-word;
+    }
+
+    .subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+        padding: 0 10px;
+    }
+
+    /* BACK */
+    .back-link {
+        position: static;
+        transform: none;
+
+        flex-direction: row;
+        gap: 8px;
+
+        align-self: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .back-link .arrow {
+        font-size: 1.4rem;
+    }
+
+    .back-link .back-text {
+        font-size: 1rem;
+        margin-top: 0;
+    }
+
+    /* accordion */
+    .accordion-item {
+        border-radius: 12px;
+    }
+
+    .accordion-header {
+        padding: 1rem;
+        font-size: 0.92rem;
+        line-height: 1.4;
+        gap: 12px;
+    }
+
+    .accordion-body-inner {
+        padding: 0 1rem 1rem;
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+
+    .arrow-icon {
+        flex-shrink: 0;
+    }
+
+    /* footer */
+    .faq-footer {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+    }
+
+    .faq-footer .contact-title {
+        font-size: 1.1rem;
+    }
+
+    .faq-footer .small {
+        font-size: 0.8rem;
+    }
+    .arrow{
+        margin-bottom: 7px;
+    }
+}
     </style>
 </head>
 <body>
     <div class="faq-container">
         <div class="flex">
             <!-- Кликабельная стрелка «Back» на другую страницу (например, главную) -->
-            <a href="дизайн_тест.html" class="back-link">
+            <a href="GhostMessage.html" class="back-link">
                 <div class="arrow">←</div>
                 <div class="back-text">Back</div>
             </a>

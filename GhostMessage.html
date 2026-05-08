@@ -3,6 +3,7 @@
 <head>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 <title>GhostMessage</title>
 
@@ -12,12 +13,21 @@ body {
     margin: 0;
     background: #1E1E1E;
     color: #00FF41;
+
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .container {
     width: 90%;
     margin: auto;
     text-align: center;
+
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 h1 {
@@ -85,6 +95,22 @@ button:hover {
 .footer {
     margin-top: 60px;
     color: #00FF41;
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.faq-link {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+
+    color: #00FF41;
+    text-decoration: none;
+    font-size: 30px;
+}
+
+.faq-link:hover {
+    text-decoration: underline;
 }
 
 .small {
@@ -100,7 +126,59 @@ button:hover {
 #decryptStatus {
     margin-top: 10px;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 40px;
+}
+.mobile-select {
+    display: none;
+    margin-bottom: 20px;
+}
+
+.mobile-select select {
+    width: 100%;
+    padding: 10px;
+    background: #1E1E1E;
+    color: #00FF41;
+    border: 1px solid #00FF41;
+    font-family: 'Roboto Mono', monospace;
+}
+.result{
+  font-size: large 40px;
+  
+}
+
+@media (max-width: 768px) {
+
+    .mobile-select {
+        display: block;
+    }
+
+    .grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .block {
+        width: 100%;
+    }
+
+    .encrypt-block,
+    .decrypt-block,
+    .output-block {
+        width: 100%;
+    }
+
+    .decrypt-block {
+        display: none;
+    }
+
+    textarea,
+    input {
+        width: calc(100% - 22px);
+    }
+    .faq-link{
+        font-size: 20px;
+    }
 }
 </style>
 
@@ -112,36 +190,55 @@ button:hover {
     <h1>GhostMessage</h1>
     <div class="subtitle">Hide your message.</div>
 
-    <div class="grid">
-        <div class="block">
-            <div>input</div>
-            <textarea id="message" placeholder="Write your message"></textarea>
-            <div class="layer2">password</div>
-            <input id="key" placeholder="Write password">
-            <button onclick="doEncrypt()">Encrypt</button>
-        </div>
-
-        <div class="block">
-            <div>output</div>
-            <textarea id="output"></textarea>
-        </div>
-
-        <div class="block">
-            <div>encrypted text</div>
-            <textarea id="message1" placeholder="Write encrypted text"></textarea>
-            <div class="layer2">password</div>
-            <input id="key1" placeholder="Write password">
-            <button onclick="doDEcrypt()">Decode</button>
-            <div id="decryptStatus"></div>
-        </div>
+    <div class="mobile-select">
+    <select id="modeSelect" onchange="switchMode()">
+        <option value="encrypt">Encrypt</option>
+        <option value="decrypt">Decrypt</option>
+    </select>
     </div>
+
+    <div class="grid">
+
+    <!-- encrypt -->
+    <div class="block encrypt-block">
+        <div>text to encrypt</div>
+        <textarea id="message" placeholder="Write your message"></textarea>
+
+        <div class="layer2">password</div>
+        <input id="key" placeholder="Write password">
+
+        <button onclick="doEncrypt()">Encrypt</button>
+    </div>
+
+    <!-- output -->
+    <div class="block output-block">
+        <div>output</div>
+        <textarea id="output"></textarea>
+        <div class="result" id="decryptStatus"></div>
+    </div>
+
+    <!-- decrypt -->
+    <div class="block decrypt-block">
+        <div>encrypted text</div>
+        <textarea id="message1" placeholder="Write encrypted text"></textarea>
+
+        <div class="layer2">password</div>
+        <input id="key1" placeholder="Write password">
+
+        <button onclick="doDEcrypt()">Decode</button>
+
+        
+    </div>
+
+</div>
 
     <div class="footer">
-        <div>Contact</div>
-        <div class="small">Telegram - @GhostMessage</div>
-        <div class="small">Mail - ghostmessage@gmail.com</div>
-        <div class=""></div>
-    </div>
+    <div>Contact</div>
+    <div class="small">Telegram - @GhostMessage</div>
+    <div class="small">Mail - ghostmessage@gmail.com</div>
+
+    <a href="faq.html" class="faq-link">FAQ</a>
+</div>
 </div>
 
 <script>
@@ -230,6 +327,45 @@ async function decryptMessage(encryptedBase64, password) {
 
   return new TextDecoder().decode(decrypted);
 }
+
+function switchMode() {
+
+    // только для мобильных
+    if (window.innerWidth > 768) {
+
+        document.querySelector('.encrypt-block').style.display = 'block';
+        document.querySelector('.decrypt-block').style.display = 'block';
+        document.querySelector('.output-block').style.display = 'block';
+
+        return;
+    }
+
+    const mode = document.getElementById('modeSelect').value;
+
+    const encryptBlock = document.querySelector('.encrypt-block');
+    const decryptBlock = document.querySelector('.decrypt-block');
+    const outputBlock = document.querySelector('.output-block');
+
+    if (mode === 'encrypt') {
+
+        encryptBlock.style.display = 'block';
+        decryptBlock.style.display = 'none';
+        outputBlock.style.display = 'block';
+
+        encryptBlock.after(outputBlock);
+
+    } else {
+
+        encryptBlock.style.display = 'none';
+        decryptBlock.style.display = 'block';
+        outputBlock.style.display = 'block';
+
+        decryptBlock.after(outputBlock);
+    }
+}
+
+window.addEventListener('load', switchMode);
+window.addEventListener('resize', switchMode);
 </script>
 
 </body>
